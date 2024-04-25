@@ -36,6 +36,7 @@ kotlin {
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.koin.android)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -52,6 +53,7 @@ kotlin {
             implementation(libs.ktor.client.encoding)
 
             implementation(libs.kermit)
+            implementation(libs.koin.core)
         }
 
         iosMain.dependencies {
