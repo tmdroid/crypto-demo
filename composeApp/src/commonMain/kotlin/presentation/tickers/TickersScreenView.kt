@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -58,10 +59,9 @@ class TickersScreenView(private val viewModel: TickersScreenViewModel) {
         Card(
             modifier = Modifier.fillMaxWidth()
                 .padding(8.dp)
-                .shadow(4.dp)
                 .clickable { println("DBG: clicked $ticker") },
-            border = BorderStroke(0.2.dp, Color.Gray),
             elevation = 8.dp,
+            shape = RoundedCornerShape(8.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth()
