@@ -1,24 +1,28 @@
 package ro.dannyb.cryptodemo
 
-import presentation.App
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
+import di.initializeKoin
+import org.koin.core.KoinApplication
+import presentation.App
+import presentation.tickers.TickersScreenView
 
 class MainActivity : ComponentActivity() {
+
+    private val koinApplication by lazy { initializeKoin() }
+
+    private val tickersScreenView by lazy { koinApplication.getViewModel<TickersScreenView>() }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            App()
+            App(tickersScreenView)
         }
     }
-}
 
-@Preview
-@Composable
-fun AppAndroidPreview() {
-    App()
+    private inline fun <reified T> KoinApplication.getViewModel(): T {
+        return koin.get()
+    }
 }
