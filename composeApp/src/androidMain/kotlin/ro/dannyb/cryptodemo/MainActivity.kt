@@ -1,6 +1,6 @@
 package ro.dannyb.cryptodemo
 
-import App
+import presentation.App
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
