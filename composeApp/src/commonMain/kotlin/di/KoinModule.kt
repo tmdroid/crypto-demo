@@ -11,6 +11,7 @@ import io.ktor.client.HttpClient
 import org.koin.core.KoinApplication
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
+import presentation.tickers.DomainTickerToTickerUiModelMapper
 import presentation.tickers.TickersScreenView
 import presentation.tickers.TickersScreenViewModel
 
@@ -20,9 +21,11 @@ val appModule = module {
 
     factory<CryptoRepository> { CryptoRepositoryImpl(get(), get()) }
 
+    factory { DomainTickerToTickerUiModelMapper() }
+
     factory { GetTickersUseCase(get()) }
 
-    factory { TickersScreenViewModel(get()) }
+    factory { TickersScreenViewModel(get(), get()) }
 
     factory { TickersScreenView(get()) }
 }

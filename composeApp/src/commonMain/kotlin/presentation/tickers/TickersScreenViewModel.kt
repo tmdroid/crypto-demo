@@ -10,17 +10,24 @@ import kotlinx.coroutines.isActive
 import presentation.CryptoViewModel
 
 class TickersScreenViewModel(
-    private val getTickersUseCase: GetTickersUseCase
+    private val getTickersUseCase: GetTickersUseCase,
+    private val domainTickerToTickerUiModelMapper: DomainTickerToTickerUiModelMapper,
 ) : CryptoViewModel() {
 
     val tickers = flow {
+        emit(TickersScreenUiState.Loading)
+
         while (currentCoroutineContext().isActive) {
             try {
                 val tickers = getTickersUseCase.execute(TICKERS)
+                    .let { domainTickerToTickerUiModelMapper.map(it) }
+                    .let { TickersScreenUiState.Success(it) }
                 emit(tickers)
             } catch (e: Exception) {
                 e.printStackTrace()
+                emit(TickersScreenUiState.Error(e.message ?: "Unknown error"))
             }
+
             delay(REFRESH_TIME)
         }
     }.shareIn(viewModelScope, SharingStarted.Lazily, replay = 1)

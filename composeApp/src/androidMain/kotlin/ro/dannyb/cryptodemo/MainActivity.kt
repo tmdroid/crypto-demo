@@ -4,9 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import di.initializeKoin
-import org.koin.core.KoinApplication
 import presentation.App
 import presentation.tickers.TickersScreenView
+import util.getViewModel
 
 class MainActivity : ComponentActivity() {
 
@@ -20,9 +20,5 @@ class MainActivity : ComponentActivity() {
         setContent {
             App(tickersScreenView)
         }
-    }
-
-    private inline fun <reified T> KoinApplication.getViewModel(): T {
-        return koin.get()
     }
 }

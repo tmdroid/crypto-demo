@@ -21,25 +21,40 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import domain.model.Ticker
 
 class TickersScreenView(private val viewModel: TickersScreenViewModel) {
 
     @Composable
     fun render() {
-        val tickers = viewModel.tickers.collectAsState(initial = emptyList())
+        val tickers = viewModel.tickers.collectAsState(initial = TickersScreenUiState.Loading)
 
+        when (tickers.value) {
+            is TickersScreenUiState.Loading -> Text("Loading...")
+            is TickersScreenUiState.Success -> {
+                val successState = tickers.value as TickersScreenUiState.Success
+                TickersList(successState.tickers)
+            }
+
+            is TickersScreenUiState.Error -> {
+                val errorState = tickers.value as TickersScreenUiState.Error
+                Text("Error: ${errorState.message}")
+            }
+        }
+    }
+
+    @Composable
+    private fun TickersList(tickers: List<TickerUiModel>) {
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(8.dp)
         ) {
-            items(items = tickers.value) { ticker ->
+            items(items = tickers) { ticker ->
                 TickerItem(ticker)
             }
         }
     }
 
     @Composable
-    private fun TickerItem(ticker: Ticker) {
+    private fun TickerItem(ticker: TickerUiModel) {
         Card(
             modifier = Modifier.fillMaxWidth()
                 .padding(8.dp)
@@ -62,7 +77,7 @@ class TickersScreenView(private val viewModel: TickersScreenViewModel) {
 
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        text = ticker.lastPrice.toString(),
+                        text = ticker.rate.toString(),
                         modifier = Modifier.fillMaxWidth(),
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp,
@@ -71,7 +86,7 @@ class TickersScreenView(private val viewModel: TickersScreenViewModel) {
                     )
 
                     Text(
-                        text = ticker.dailyChangeString,
+                        text = ticker.dailyChange,
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.End,
                         color = ticker.dailyChangeColor,
