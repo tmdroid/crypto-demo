@@ -9,6 +9,7 @@ sealed class TickersScreenUiState {
 }
 
 data class TickerUiModel(
+    val iconUrl: String,
     val symbol: String,
     val rate: Double,
     val dailyChange: String,

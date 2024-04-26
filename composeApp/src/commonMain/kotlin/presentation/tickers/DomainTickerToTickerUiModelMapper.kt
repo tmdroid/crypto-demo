@@ -9,6 +9,7 @@ import kotlin.math.abs
 class DomainTickerToTickerUiModelMapper : DataMapper<List<Ticker>, List<TickerUiModel>> {
     override fun map(input: List<Ticker>): List<TickerUiModel> = input.map {
         TickerUiModel(
+            iconUrl = "${COIN_BASE_URL}/${it.icon}",
             symbol = it.symbol,
             rate = it.lastPrice,
             dailyChange = it.dailyChangePerc.let {
@@ -20,5 +21,10 @@ class DomainTickerToTickerUiModelMapper : DataMapper<List<Ticker>, List<TickerUi
             },
             dailyChangeColor = if (it.dailyChangePerc > 0) Colors.COLOR_GREEN else Colors.COLOR_RED
         )
+    }
+
+    companion object {
+        private const val COIN_BASE_URL =
+            "https://raw.githubusercontent.com/Cryptofonts/cryptoicons/master/SVG"
     }
 }
