@@ -19,6 +19,7 @@ kotlinx = "1.8.0"
 ktor-client = "2.3.6" #latest version of Ktor
 kermit = "2.0.3"
 koin = "3.4.2"
+kamel = "0.9.4"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -48,6 +49,7 @@ ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negoti
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+kamel-image = { module = "media.kamel:kamel-image", version.ref = "kamel" }
 
 
 [plugins]

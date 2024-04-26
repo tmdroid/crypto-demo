@@ -54,6 +54,7 @@ kotlin {
 
             implementation(libs.kermit)
             implementation(libs.koin.core)
+            implementation(libs.kamel.image)
         }
 
         iosMain.dependencies {
