@@ -12,14 +12,25 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.sharp.ArrowBack
+import androidx.compose.material.icons.sharp.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -32,7 +43,12 @@ class TickersScreenView(private val viewModel: TickersScreenViewModel) {
         val tickers = viewModel.tickers.collectAsState(initial = TickersScreenUiState.Loading)
 
         Column(modifier = Modifier.fillMaxSize()) {
-            Toolbar()
+            Toolbar(
+                searchQuery = viewModel.searchQuery.collectAsState().value,
+                inFilterMode = viewModel.inFilterMode,
+                onSearchQueryChange = viewModel::onSearchQueryChange,
+                onFilterModeChange = viewModel::onFilterModeChange
+            )
 
             when (tickers.value) {
                 is TickersScreenUiState.Loading -> LoadingRow(text = "Loading...")
@@ -56,13 +72,72 @@ class TickersScreenView(private val viewModel: TickersScreenViewModel) {
     }
 
     @Composable
-    private fun Toolbar() {
-        TopAppBar(
-            title = { Text("Crypto Tickers") },
-            backgroundColor = Color.Blue,
-            contentColor = Color.White,
-            modifier = Modifier.fillMaxWidth().shadow(8.dp)
-        )
+    private fun Toolbar(
+        searchQuery: String,
+        inFilterMode: Boolean,
+        onSearchQueryChange: (String) -> Unit,
+        onFilterModeChange: (Boolean) -> Unit
+    ) {
+        if (inFilterMode) {
+            // a top app bar with a back button and an input field
+
+            val focusRequester = remember { FocusRequester() }
+
+            TopAppBar(
+                navigationIcon = {
+                    IconButton(onClick = {
+                        onFilterModeChange(false)
+                    }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Sharp.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                },
+                title = {
+                    TextField(
+                        value = searchQuery,
+                        onValueChange = { onSearchQueryChange(it) },
+                        label = { Text("Filter tickers...") },
+                        modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
+                        singleLine = true,
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Sharp.Search,
+                                contentDescription = "Search"
+                            )
+                        },
+                        colors = TextFieldDefaults.textFieldColors(
+                            backgroundColor = MaterialTheme.colors.surface,
+                            textColor = MaterialTheme.colors.onSurface,
+                        ),
+                    )
+                },
+                backgroundColor = MaterialTheme.colors.background,
+                contentColor = MaterialTheme.colors.onBackground,
+                elevation = 8.dp,
+            )
+
+            LaunchedEffect(Unit) {
+                focusRequester.requestFocus()
+            }
+        } else {
+            TopAppBar(
+                title = { Text("Crypto Tickers") },
+                backgroundColor = MaterialTheme.colors.background,
+                contentColor = MaterialTheme.colors.onBackground,
+                modifier = Modifier.fillMaxWidth().shadow(8.dp),
+                actions = {
+                    IconButton(onClick = { onFilterModeChange(true) }) {
+                        Icon(
+                            imageVector = Icons.Sharp.Search,
+                            contentDescription = "Filter"
+                        )
+                    }
+                }
+            )
+
+        }
     }
 
     @Composable
