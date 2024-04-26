@@ -1,7 +1,7 @@
 package presentation.tickers
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,7 +11,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -29,24 +31,64 @@ class TickersScreenView(private val viewModel: TickersScreenViewModel) {
     fun render() {
         val tickers = viewModel.tickers.collectAsState(initial = TickersScreenUiState.Loading)
 
-        when (tickers.value) {
-            is TickersScreenUiState.Loading -> Text("Loading...")
-            is TickersScreenUiState.Success -> {
-                val successState = tickers.value as TickersScreenUiState.Success
-                TickersList(successState.tickers)
-            }
+        Column(modifier = Modifier.fillMaxSize()) {
+            Toolbar()
 
-            is TickersScreenUiState.Error -> {
-                val errorState = tickers.value as TickersScreenUiState.Error
-                Text("Error: ${errorState.message}")
+            when (tickers.value) {
+                is TickersScreenUiState.Loading -> LoadingRow(text = "Loading...")
+                is TickersScreenUiState.Success -> {
+                    val successState = tickers.value as TickersScreenUiState.Success
+                    TickersList(successState.tickers)
+                }
+
+                is TickersScreenUiState.Error -> {
+                    val errorState = tickers.value as TickersScreenUiState.Error
+                    Text(
+                        text = "Error: ${errorState.message}",
+                        modifier = Modifier.fillMaxSize().padding(32.dp),
+                        textAlign = TextAlign.Center,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
             }
         }
     }
 
     @Composable
+    private fun Toolbar() {
+        TopAppBar(
+            title = { Text("Crypto Tickers") },
+            backgroundColor = Color.Blue,
+            contentColor = Color.White,
+            modifier = Modifier.fillMaxWidth().shadow(8.dp)
+        )
+    }
+
+    @Composable
+    private fun LoadingRow(text: String) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterVertically))
+
+            Text(
+                text = text,
+                modifier = Modifier.padding(32.dp),
+                textAlign = TextAlign.Center,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+            )
+
+        }
+
+    }
+
+    @Composable
     private fun TickersList(tickers: List<TickerUiModel>) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(8.dp)
+            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)
         ) {
             items(items = tickers) { ticker ->
                 TickerItem(ticker)
