@@ -1,10 +1,10 @@
 package domain
 
-import data.remote.DataSourcesConfig
-import data.remote.DataSourcesConfig.DataSourceType
+import data.remote.CryptoDataSourcesConfig
+import data.remote.CryptoDataSourcesConfig.DataSourceType
 import data.remote.RemoteCryptoRepositoryImpl
 import data.remote.bitfinex.BitfinanceTickerDtoToDomainTickerMapper
-import data.remote.bitfinex.BitfinexDataSource
+import data.remote.bitfinex.BitfinexCryptoDataSource
 import data.remote.bitfinex.BitfinexService
 import data.remote.bitfinex.dto.BitfinexTickerDataDto
 import data.remote.bitfinex.dto.BitfinexTickersResponseDto
@@ -21,10 +21,10 @@ class GetTickersUseCaseTest {
     fun setup() {
         val mapper = BitfinanceTickerDtoToDomainTickerMapper()
         val stubbedBitfinexService = StubBitfinexServiceImpl()
-        val config = DataSourcesConfig(
+        val config = CryptoDataSourcesConfig(
             mapOf(DataSourceType.BITFINEX to true)
         )
-        val dataSource = BitfinexDataSource(stubbedBitfinexService, mapper, config)
+        val dataSource = BitfinexCryptoDataSource(stubbedBitfinexService, mapper, config)
         val repository = RemoteCryptoRepositoryImpl(listOf(dataSource))
         useCase = GetTickersUseCase(repository)
     }

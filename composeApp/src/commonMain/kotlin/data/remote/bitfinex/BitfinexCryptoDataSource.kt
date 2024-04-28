@@ -1,21 +1,22 @@
 package data.remote.bitfinex
 
 import data.remote.CryptoDataSource
-import data.remote.DataSourcesConfig
-import data.remote.DataSourcesConfig.DataSourceType
+import data.remote.CryptoDataSourcesConfig.DataSourceType
+import data.remote.GetDataSourcesConfig
 import domain.model.Ticker
 
-class BitfinexDataSource(
+class BitfinexCryptoDataSource(
     private val bitfinexService: BitfinexService,
     private val mapper: BitfinanceTickerDtoToDomainTickerMapper,
-    private val config: DataSourcesConfig,
+    private val config: GetDataSourcesConfig,
 ) : CryptoDataSource {
 
     override val type: DataSourceType get() = DataSourceType.BITFINEX
 
     override val isActive: Boolean get() = config.getIsActive(type)
 
-    override suspend fun getTickers(): List<Ticker> = mapper.map(bitfinexService.getTickers(TICKERS))
+    override suspend fun getTickers(): List<Ticker> =
+        mapper.map(bitfinexService.getTickers(TICKERS))
 
     companion object {
         private val TICKERS = listOf(

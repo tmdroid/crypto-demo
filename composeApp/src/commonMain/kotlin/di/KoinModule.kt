@@ -1,10 +1,12 @@
 package di
 
 import data.client
-import data.remote.DataSourcesConfig
-import data.remote.DataSourcesConfig.DataSourceType
+import data.remote.CryptoDataSourcesConfig
+import data.remote.CryptoDataSourcesConfig.DataSourceType
+import data.remote.GetDataSourcesConfig
 import data.remote.RemoteCryptoRepositoryImpl
-import data.remote.bitfinex.BitfinexDataSource
+import data.remote.SetDataSourcesConfig
+import data.remote.bitfinex.BitfinexCryptoDataSource
 import data.remote.bitfinex.BitfinexService
 import data.remote.bitfinex.RemoteBitfinexServiceImpl
 import data.remote.bitfinex.BitfinanceTickerDtoToDomainTickerMapper
@@ -22,11 +24,11 @@ val appModule = module {
 
     factory<HttpClient> { client }
 
-    factory { BitfinexDataSource(bitfinexService = get(), mapper = get(), config = get()) }
+    factory { BitfinexCryptoDataSource(bitfinexService = get(), mapper = get(), config = get()) }
 
     factory<CryptoRepository> {
         val dataSources = listOf(
-            get<BitfinexDataSource>()
+            get<BitfinexCryptoDataSource>()
         )
         RemoteCryptoRepositoryImpl(dataSources)
     }
@@ -45,12 +47,16 @@ val appModule = module {
     factory { TickersScreenView(viewModel = get()) }
 
     single {
-        DataSourcesConfig(
+        CryptoDataSourcesConfig(
             mapOf(
                 DataSourceType.BITFINEX to true
             )
         )
     }
+
+    single<GetDataSourcesConfig> { get<CryptoDataSourcesConfig>() }
+
+    single<SetDataSourcesConfig> { get<CryptoDataSourcesConfig>() }
 }
 
 val bitfinexModule = module {
