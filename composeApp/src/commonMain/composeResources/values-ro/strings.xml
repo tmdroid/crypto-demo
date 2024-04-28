@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Aplicatie Piata Crypto</string>
+    <string name="back">Inapoi</string>
+    <string name="search">Cauta</string>
+    <string name="filter_tickers">Filtreaza simboluri...</string>
+    <string name="filter">Filtreaza</string>
+    <string name="loading">Se incarca...</string>
+    <string name="token_icon_description">pictograma %1$s</string>
+    <string name="generic_error">Eroare: %1$s</string>
+</resources>
