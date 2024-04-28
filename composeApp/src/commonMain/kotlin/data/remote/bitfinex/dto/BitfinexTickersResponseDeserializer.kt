@@ -16,7 +16,7 @@ import kotlinx.serialization.json.doubleOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
 
-object TickerDataResponseDeserializer : KSerializer<BitfinexTickersResponseDto> {
+object BitfinexTickersResponseDeserializer : KSerializer<BitfinexTickersResponseDto> {
     override val descriptor: SerialDescriptor
         get() = buildClassSerialDescriptor(checkNotNull(BitfinexTickersResponseDto::class.simpleName))
 
