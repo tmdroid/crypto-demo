@@ -1,7 +1,6 @@
 package presentation.tickers
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,12 +9,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.sharp.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,92 +28,96 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cryptomarketplaceapp.composeapp.generated.resources.Res
-import cryptomarketplaceapp.composeapp.generated.resources.generic_error
+import cryptomarketplaceapp.composeapp.generated.resources.filter
 import cryptomarketplaceapp.composeapp.generated.resources.loading
 import cryptomarketplaceapp.composeapp.generated.resources.token_icon_description
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
+import presentation.ScreenView
+import presentation.common.ErrorRow
+import presentation.common.LoadingRow
 import presentation.common.Toolbar
 
 @OptIn(ExperimentalResourceApi::class)
-class TickersScreenView(private val viewModel: TickersScreenViewModel) {
+class TickersScreenView(
+    private val viewModel: TickersScreenViewModel,
+) : ScreenView() {
 
     @Composable
-    fun render() {
-        val tickers = viewModel.uiState.collectAsState(initial = TickersScreenUiState.Loading)
+    fun render(scrollState: LazyListState, onTickerClicked: (String) -> Unit) {
+        val uiState = viewModel.uiState.collectAsState(initial = TickersScreenUiState.Loading)
 
         Column(modifier = Modifier.fillMaxSize()) {
             Toolbar(
                 searchQuery = viewModel.searchQuery.collectAsState().value,
                 onSearchQueryChange = viewModel::onSearchQueryChange,
+                onSearchModeChange = viewModel::onSearchModeChange,
+                inSearchMode = viewModel.searchMode.collectAsState().value,
+                actions = {
+                    IconButton(onClick = {
+                        viewModel.onSearchModeChange(true)
+                        viewModel.onSearchQueryChange(null)
+                    }) {
+                        Icon(
+                            imageVector = Icons.Sharp.Search,
+                            contentDescription = stringResource(resource = Res.string.filter)
+                        )
+                    }
+                }
             )
 
-            when (tickers.value) {
-                is TickersScreenUiState.Loading -> {
-                    LoadingRow(text = stringResource(resource = Res.string.loading))
-                }
+            renderContent(scrollState, uiState, onTickerClicked)
+        }
+    }
 
-                is TickersScreenUiState.Success -> {
-                    val successState = tickers.value as TickersScreenUiState.Success
-                    TickersList(successState.tickers)
-                }
+    @Composable
+    private fun renderContent(
+        scrollState: LazyListState,
+        uiState: State<TickersScreenUiState>,
+        onTickerClicked: (String) -> Unit
+    ) {
+        when (uiState.value) {
+            is TickersScreenUiState.Loading -> {
+                LoadingRow(text = stringResource(resource = Res.string.loading))
+            }
 
-                is TickersScreenUiState.Error -> {
-                    val errorState = tickers.value as TickersScreenUiState.Error
-                    Text(
-                        text = stringResource(
-                            resource = Res.string.generic_error,
-                            errorState.message
-                        ),
-                        modifier = Modifier.fillMaxSize().padding(32.dp),
-                        textAlign = TextAlign.Center,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
+            is TickersScreenUiState.Success -> {
+                val successState = uiState.value as TickersScreenUiState.Success
+                TickersList(scrollState, successState.tickers, onTickerClicked)
+            }
+
+            is TickersScreenUiState.Error -> {
+                val errorState = uiState.value as TickersScreenUiState.Error
+                ErrorRow(message = errorState.message)
             }
         }
     }
 
     @Composable
-    private fun LoadingRow(text: String) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterVertically))
-
-            Text(
-                text = text,
-                modifier = Modifier.padding(32.dp),
-                textAlign = TextAlign.Center,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-            )
-
-        }
-
-    }
-
-    @Composable
-    private fun TickersList(tickers: List<TickerUiModel>) {
+    private fun TickersList(
+        scrollState: LazyListState,
+        tickers: List<TickerUiModel>,
+        onTickerClicked: (String) -> Unit
+    ) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)
+            modifier = Modifier.fillMaxSize()
+                .padding(horizontal = 16.dp),
+            state = scrollState,
         ) {
             items(items = tickers) { ticker ->
-                TickerItem(ticker)
+                TickerItem(ticker, onTickerClicked)
             }
         }
     }
 
     @Composable
-    private fun TickerItem(ticker: TickerUiModel) {
+    private fun TickerItem(ticker: TickerUiModel, onTickerClicked: (String) -> Unit) {
         Card(
             modifier = Modifier.fillMaxWidth()
                 .padding(8.dp)
-                .clickable { println("DBG: clicked $ticker") },
+                .clickable { onTickerClicked(ticker.symbol) },
             elevation = 8.dp,
             shape = RoundedCornerShape(8.dp)
         ) {

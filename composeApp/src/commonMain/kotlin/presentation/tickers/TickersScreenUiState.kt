@@ -3,7 +3,7 @@ package presentation.tickers
 import androidx.compose.ui.graphics.Color
 
 sealed class TickersScreenUiState {
-    object Loading : TickersScreenUiState()
+    data object Loading : TickersScreenUiState()
     data class Success(val tickers: List<TickerUiModel>) : TickersScreenUiState()
     data class Error(val message: String) : TickersScreenUiState()
 }

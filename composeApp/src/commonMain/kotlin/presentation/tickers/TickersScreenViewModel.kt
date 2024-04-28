@@ -21,6 +21,9 @@ class TickersScreenViewModel(
     private val domainTickerToTickerUiModelMapper: DomainTickerToTickerUiModelMapper,
 ) : CryptoViewModel() {
 
+    var searchMode = MutableStateFlow(false)
+        private set
+
     var searchQuery = MutableStateFlow("")
         private set
 
@@ -48,13 +51,17 @@ class TickersScreenViewModel(
         searchQuery.update { query.orEmpty() }
     }
 
+    fun onSearchModeChange(searchMode: Boolean) {
+        this.searchMode.update { searchMode }
+    }
+
     private fun Flow<TickersScreenUiState>.filterTickersBy(
         searchQuery: MutableStateFlow<String>
     ): Flow<TickersScreenUiState> = flatMapLatest { uiState ->
         val newState = when {
             uiState is TickersScreenUiState.Success -> {
                 val search = searchQuery.value
-                val matches = if (search.isNotEmpty()){
+                val matches = if (search.isNotEmpty()) {
                     uiState.tickers.filter { ticker ->
                         ticker.symbol.contains(search, ignoreCase = true)
                     }
