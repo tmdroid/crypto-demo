@@ -1,8 +1,5 @@
 package presentation.tickers
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import domain.GetTickersUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.currentCoroutineContext
@@ -25,9 +22,6 @@ class TickersScreenViewModel(
 ) : CryptoViewModel() {
 
     var searchQuery = MutableStateFlow("")
-        private set
-
-    var inFilterMode by mutableStateOf(false)
         private set
 
     private val _tickers = flow {
@@ -62,15 +56,8 @@ class TickersScreenViewModel(
             } else _tickers
         }
 
-    fun onSearchQueryChange(query: String) {
-        searchQuery.update { query }
-    }
-
-    fun onFilterModeChange(filterMode: Boolean) {
-        inFilterMode = filterMode
-        if(!inFilterMode) {
-            searchQuery.update { "" }
-        }
+    fun onSearchQueryChange(query: String?) {
+        searchQuery.update { query.orEmpty() }
     }
 
     companion object {

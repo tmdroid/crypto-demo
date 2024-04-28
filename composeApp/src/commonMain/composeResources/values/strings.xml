@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Crypto Marketplace App</string>
+    <string name="back">Back</string>
+    <string name="search">Search</string>
+    <string name="filter_tickers">Filter tickers...</string>
+    <string name="filter">Filter</string>
+    <string name="loading">Loading...</string>
+    <string name="token_icon_description">%1$s icon</string>
+    <string name="generic_error">Error: %1$s</string>
+</resources>
