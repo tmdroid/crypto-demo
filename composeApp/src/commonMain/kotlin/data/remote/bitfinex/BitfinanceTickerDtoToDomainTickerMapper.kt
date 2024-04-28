@@ -1,8 +1,9 @@
-package data.remote.mapper
+package data.remote.bitfinex
 
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toLowerCase
 import data.remote.bitfinex.dto.BitfinexTickersResponseDto
+import data.mapper.DataMapper
 import domain.model.Ticker
 
 class BitfinanceTickerDtoToDomainTickerMapper :

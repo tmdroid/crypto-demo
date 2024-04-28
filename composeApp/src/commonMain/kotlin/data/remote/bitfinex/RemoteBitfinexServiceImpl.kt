@@ -8,6 +8,7 @@ import io.ktor.client.request.get
 class RemoteBitfinexServiceImpl(
     private val client: HttpClient
 ) : BitfinexService {
+
     override suspend fun getTickers(symbols: List<String>): BitfinexTickersResponseDto {
         val joinedSymbols = symbols.joinToString(",")
         val symbolsQuery = "$SYMBOLS_QUERY=$joinedSymbols"

@@ -38,7 +38,7 @@ class TickersScreenView(private val viewModel: TickersScreenViewModel) {
 
     @Composable
     fun render() {
-        val tickers = viewModel.tickers.collectAsState(initial = TickersScreenUiState.Loading)
+        val tickers = viewModel.uiState.collectAsState(initial = TickersScreenUiState.Loading)
 
         Column(modifier = Modifier.fillMaxSize()) {
             Toolbar(

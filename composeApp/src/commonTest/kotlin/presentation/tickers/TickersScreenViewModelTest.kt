@@ -15,7 +15,6 @@ class TickersScreenViewModelTest {
 
     private lateinit var viewModel: TickersScreenViewModel
 
-
     @BeforeTest
     fun setUp() {
         viewModel = TickersScreenViewModel(
@@ -30,7 +29,7 @@ class TickersScreenViewModelTest {
         viewModel.onSearchQueryChange("")
 
         // When
-        val uiState = viewModel.tickers.skipLoading().first() as TickersScreenUiState.Success
+        val uiState = viewModel.uiState.skipLoading().first() as TickersScreenUiState.Success
 
         // Then
         val tickers = uiState.tickers
@@ -44,7 +43,7 @@ class TickersScreenViewModelTest {
         viewModel.onSearchQueryChange("btc")
 
         // When
-        val uiState = viewModel.tickers.skipLoading().first() as TickersScreenUiState.Success
+        val uiState = viewModel.uiState.skipLoading().first() as TickersScreenUiState.Success
 
         // Then
         val tickers = uiState.tickers
@@ -57,7 +56,7 @@ class TickersScreenViewModelTest {
     }
 
     private class StubCryptoRepository : CryptoRepository {
-        override suspend fun getTickers(symbols: List<String>): List<Ticker> = TICKERS
+        override suspend fun getTickers(): List<Ticker> = TICKERS
     }
 
     companion object {

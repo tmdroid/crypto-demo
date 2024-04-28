@@ -1,6 +1,6 @@
 package presentation.tickers
 
-import data.remote.mapper.DataMapper
+import data.mapper.DataMapper
 import domain.model.Ticker
 import theme.Colors
 import util.roundStringToDecimals

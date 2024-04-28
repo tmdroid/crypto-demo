@@ -24,12 +24,12 @@ class TickersScreenViewModel(
     var searchQuery = MutableStateFlow("")
         private set
 
-    private val _tickers = flow {
+    private val _uiState = flow {
         emit(TickersScreenUiState.Loading)
 
         while (currentCoroutineContext().isActive) {
             try {
-                val tickers = getTickersUseCase.execute(TICKERS)
+                val tickers = getTickersUseCase.execute()
                     .let { domainTickerToTickerUiModelMapper.map(it) }
                     .let { TickersScreenUiState.Success(it) }
                 emit(tickers)
@@ -42,7 +42,7 @@ class TickersScreenViewModel(
         }
     }.shareIn(viewModelScope, SharingStarted.Lazily, replay = 1)
 
-    val tickers: Flow<TickersScreenUiState> get() = _tickers.filterTickersBy(searchQuery)
+    val uiState: Flow<TickersScreenUiState> get() = _uiState.filterTickersBy(searchQuery)
 
     fun onSearchQueryChange(query: String?) {
         searchQuery.update { query.orEmpty() }
@@ -69,26 +69,5 @@ class TickersScreenViewModel(
 
     companion object {
         private const val REFRESH_TIME = 5000L
-        private val TICKERS = listOf(
-            "tBTCUSD",
-            "tETHUSD",
-            "tTRXUSD",
-            "tLTCUSD",
-            "tXRPUSD",
-            "tSOLUSD",
-            "tTONUSD",
-            "tEOSUSD",
-            "tBCHUSD",
-            "tICPUSD",
-            "tSHIB:USD",
-            "tDOGE:USD",
-            "tMATIC:USD",
-            "tNEXO:USD",
-            "tOCEAN:USD",
-            "tAAVE:USD",
-            "tLINK:USD",
-            "tFILUSD"
-        )
     }
-
 }

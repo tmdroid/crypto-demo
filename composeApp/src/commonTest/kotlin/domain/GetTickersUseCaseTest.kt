@@ -1,37 +1,38 @@
 package domain
 
-import data.remote.CryptoRepositoryImpl
+import data.remote.DataSourcesConfig
+import data.remote.DataSourcesConfig.DataSourceType
+import data.remote.RemoteCryptoRepositoryImpl
+import data.remote.bitfinex.BitfinanceTickerDtoToDomainTickerMapper
+import data.remote.bitfinex.BitfinexDataSource
 import data.remote.bitfinex.BitfinexService
 import data.remote.bitfinex.dto.BitfinexTickerDataDto
 import data.remote.bitfinex.dto.BitfinexTickersResponseDto
-import data.remote.mapper.BitfinanceTickerDtoToDomainTickerMapper
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class GetTickersUseCaseTest {
 
     private lateinit var useCase: GetTickersUseCase
-    private lateinit var repository: CryptoRepository
-    private lateinit var localBitfinexService: BitfinexService
 
     @BeforeTest
     fun setup() {
         val mapper = BitfinanceTickerDtoToDomainTickerMapper()
-        localBitfinexService = StubBitfinexServiceImpl()
-        repository = CryptoRepositoryImpl(localBitfinexService, mapper)
+        val stubbedBitfinexService = StubBitfinexServiceImpl()
+        val config = DataSourcesConfig(
+            mapOf(DataSourceType.BITFINEX to true)
+        )
+        val dataSource = BitfinexDataSource(stubbedBitfinexService, mapper, config)
+        val repository = RemoteCryptoRepositoryImpl(listOf(dataSource))
         useCase = GetTickersUseCase(repository)
     }
 
     @Test
     fun `when execute then getTickers from repository`() = runTest {
-        // Given
-        val symbols = listOf(ALL_TICKERS)
-
         // When
-        val tickers = useCase.execute(symbols)
+        val tickers = useCase.execute()
 
         // Then
         // Verify getTickers from repository
@@ -59,6 +60,5 @@ class GetTickersUseCaseTest {
                 65783.0
             )
         )
-        private const val ALL_TICKERS = "ALL"
     }
 }

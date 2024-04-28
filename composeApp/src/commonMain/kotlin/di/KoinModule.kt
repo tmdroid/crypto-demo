@@ -1,10 +1,13 @@
 package di
 
 import data.client
-import data.remote.CryptoRepositoryImpl
+import data.remote.DataSourcesConfig
+import data.remote.DataSourcesConfig.DataSourceType
+import data.remote.RemoteCryptoRepositoryImpl
+import data.remote.bitfinex.BitfinexDataSource
 import data.remote.bitfinex.BitfinexService
 import data.remote.bitfinex.RemoteBitfinexServiceImpl
-import data.remote.mapper.BitfinanceTickerDtoToDomainTickerMapper
+import data.remote.bitfinex.BitfinanceTickerDtoToDomainTickerMapper
 import domain.CryptoRepository
 import domain.GetTickersUseCase
 import io.ktor.client.HttpClient
@@ -19,20 +22,40 @@ val appModule = module {
 
     factory<HttpClient> { client }
 
-    factory<CryptoRepository> { CryptoRepositoryImpl(get(), get()) }
+    factory { BitfinexDataSource(bitfinexService = get(), mapper = get(), config = get()) }
+
+    factory<CryptoRepository> {
+        val dataSources = listOf(
+            get<BitfinexDataSource>()
+        )
+        RemoteCryptoRepositoryImpl(dataSources)
+    }
 
     factory { DomainTickerToTickerUiModelMapper() }
 
-    factory { GetTickersUseCase(get()) }
+    factory { GetTickersUseCase(cryptoRepository = get()) }
 
-    factory { TickersScreenViewModel(get(), get()) }
+    factory {
+        TickersScreenViewModel(
+            getTickersUseCase = get(),
+            domainTickerToTickerUiModelMapper = get()
+        )
+    }
 
-    factory { TickersScreenView(get()) }
+    factory { TickersScreenView(viewModel = get()) }
+
+    single {
+        DataSourcesConfig(
+            mapOf(
+                DataSourceType.BITFINEX to true
+            )
+        )
+    }
 }
 
 val bitfinexModule = module {
 
-    factory<BitfinexService> { RemoteBitfinexServiceImpl(get()) }
+    factory<BitfinexService> { RemoteBitfinexServiceImpl(client = get()) }
 
     factory { BitfinanceTickerDtoToDomainTickerMapper() }
 
