@@ -9,7 +9,7 @@ import kotlin.math.abs
 class DomainTickerToTickerUiModelMapper : DataMapper<List<Ticker>, List<TickerUiModel>> {
     override fun map(input: List<Ticker>): List<TickerUiModel> = input.map {
         TickerUiModel(
-            iconUrl = "${COIN_BASE_URL}/${it.icon}",
+            iconUrl = "${COIN_ICON_BASE_URL}/${it.icon}",
             symbol = it.symbol,
             rate = it.lastPrice,
             dailyChange = it.dailyChangePerc.let {
@@ -24,7 +24,7 @@ class DomainTickerToTickerUiModelMapper : DataMapper<List<Ticker>, List<TickerUi
     }
 
     companion object {
-        private const val COIN_BASE_URL =
+        private const val COIN_ICON_BASE_URL =
             "https://raw.githubusercontent.com/Cryptofonts/cryptoicons/master/SVG"
     }
 }
