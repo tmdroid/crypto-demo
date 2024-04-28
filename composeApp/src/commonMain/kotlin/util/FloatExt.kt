@@ -8,7 +8,7 @@ fun Float.roundStringToDecimals(decimals: Int): String {
     val roundedValue = (this * dotAt).roundToInt()
     val integral = (roundedValue / dotAt)
     val fractional = ((roundedValue % dotAt).toFloat() / dotAt).toString().let {
-        if (it.length == 3) "${it}0" else it
+        if(it.split(".").last().length == 1) "${it}0" else it
     }
     return "$integral.${fractional.split(".").last()}"
 }
