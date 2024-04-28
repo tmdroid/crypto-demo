@@ -33,7 +33,6 @@ val client: HttpClient
         }
         defaultRequest {
             header("Content-Type", "application/json")
-            url("https://api-pub.bitfinex.com/v2/")
         }
         install(ContentNegotiation) {
             json(Json {
