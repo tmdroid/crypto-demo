@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
@@ -42,22 +42,29 @@ class TickersScreenViewModel(
         }
     }.shareIn(viewModelScope, SharingStarted.Lazily, replay = 1)
 
-    val tickers: Flow<TickersScreenUiState>
-        get() = searchQuery.flatMapLatest { query ->
-            if (query.isNotEmpty()) {
-                _tickers.map { uiState ->
-                    if (uiState is TickersScreenUiState.Success) {
-                        val matches = uiState.tickers.filter { ticker ->
-                            ticker.symbol.contains(query, ignoreCase = true)
-                        }
-                        uiState.copy(tickers = matches)
-                    } else uiState
-                }
-            } else _tickers
-        }
+    val tickers: Flow<TickersScreenUiState> get() = _tickers.filterTickersBy(searchQuery)
 
     fun onSearchQueryChange(query: String?) {
         searchQuery.update { query.orEmpty() }
+    }
+
+    private fun Flow<TickersScreenUiState>.filterTickersBy(
+        searchQuery: MutableStateFlow<String>
+    ): Flow<TickersScreenUiState> = flatMapLatest { uiState ->
+        val newState = when {
+            uiState is TickersScreenUiState.Success -> {
+                val search = searchQuery.value
+                val matches = if (search.isNotEmpty()){
+                    uiState.tickers.filter { ticker ->
+                        ticker.symbol.contains(search, ignoreCase = true)
+                    }
+                } else uiState.tickers
+                uiState.copy(tickers = matches)
+            }
+
+            else -> uiState
+        }
+        flowOf(newState)
     }
 
     companion object {
